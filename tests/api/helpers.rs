@@ -75,6 +75,7 @@ pub async fn spawn_app() -> TestApp {
         c.email_client.base_url = email_server.uri();
         c
     };
+
     configure_database(&configuration.database).await;
 
     let application = Application::build(configuration.clone())
