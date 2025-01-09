@@ -35,11 +35,17 @@ pub enum SubscribeError {
     UnexpectedError(#[from] anyhow::Error),
 }
 
+impl std::fmt::Debug for SubscribeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        error_chain_fmt(self, f)
+    }
+}
+
 impl ResponseError for SubscribeError {
     fn status_code(&self) -> StatusCode {
         match self {
-            Self::ValidationError(_) => StatusCode::BAD_REQUEST,
-            Self::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            SubscribeError::ValidationError(_) => StatusCode::BAD_REQUEST,
+            SubscribeError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
@@ -62,7 +68,7 @@ pub async fn subscribe(
     let mut transaction = pool
         .begin()
         .await
-        .context("Failed to acquire a Postgres connection from the pool.")?;
+        .context("Failed to acquire a Postgres connection from the pool")?;
     let subscriber_id = insert_subscriber(&mut transaction, &new_subscriber)
         .await
         .context("Failed to insert new subscriber in the database.")?;
@@ -89,7 +95,7 @@ fn generate_subscription_token() -> String {
     let mut rng = thread_rng();
     std::iter::repeat_with(|| rng.sample(Alphanumeric))
         .map(char::from)
-        .take(24)
+        .take(25)
         .collect()
 }
 
@@ -139,10 +145,7 @@ pub async fn insert_subscriber(
         new_subscriber.name.as_ref(),
         Utc::now()
     );
-    transaction.execute(query).await.map_err(|e| {
-        tracing::error!("Failed to execute query: {:?}", e);
-        e
-    })?;
+    transaction.execute(query).await?;
     Ok(subscriber_id)
 }
 
@@ -163,10 +166,7 @@ pub async fn store_token(
         subscription_token,
         subscriber_id
     );
-    transaction.execute(query).await.map_err(|e| {
-        tracing::error!("Failed to execute query: {:?}", e);
-        StoreTokenError(e)
-    })?;
+    transaction.execute(query).await.map_err(StoreTokenError)?;
     Ok(())
 }
 
@@ -198,10 +198,10 @@ pub fn error_chain_fmt(
     f: &mut std::fmt::Formatter<'_>,
 ) -> std::fmt::Result {
     writeln!(f, "{}\n", e)?;
-    let mut source = e.source();
-    while let Some(cause) = source {
+    let mut current = e.source();
+    while let Some(cause) = current {
         writeln!(f, "Caused by:\n\t{}", cause)?;
-        source = cause.source();
+        current = cause.source();
     }
     Ok(())
 }
