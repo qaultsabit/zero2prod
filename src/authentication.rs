@@ -41,7 +41,7 @@ pub async fn validate_credentials(
         let _ = verify_password_hash(expected_password_hash, credentials.password);
     })
     .await
-    .context("Failed to spawn blocking task.")??;
+    .context("Failed to spawn blocking task.")?;
 
     user_id
         .ok_or_else(|| anyhow::anyhow!("Unknown username."))
