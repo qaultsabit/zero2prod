@@ -1,8 +1,7 @@
-use actix_web::{http::header::ContentType, web, HttpResponse};
-use hmac::Hmac;
-use secrecy::ExposeSecret;
-
 use crate::startup::HmacSecret;
+use actix_web::{http::header::ContentType, web, HttpResponse};
+use hmac::{Hmac, Mac};
+use secrecy::ExposeSecret;
 
 #[derive(serde::Deserialize)]
 pub struct QueryParams {
@@ -18,7 +17,7 @@ impl QueryParams {
         let mut mac =
             Hmac::<sha2::Sha256>::new_from_slice(secret.0.expose_secret().as_bytes()).unwrap();
         mac.update(query_string.as_bytes());
-        mac.verify(&tag)?;
+        mac.verify_slice(&tag)?;
 
         Ok(self.error)
     }
@@ -30,7 +29,7 @@ pub async fn login_form(
 ) -> HttpResponse {
     let error_html = match query {
         None => "".into(),
-        Some(query) => match query.verify(&secret) {
+        Some(query) => match query.0.verify(&secret) {
             Ok(error) => {
                 format!("<p><i>{}</i></p>", htmlescape::encode_minimal(&error))
             }
