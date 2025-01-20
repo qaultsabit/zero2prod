@@ -2,7 +2,7 @@ use crate::startup::HmacSecret;
 use actix_web::{
     cookie::{time::Duration, Cookie},
     http::header::ContentType,
-    HttpRequest, HttpResponse,
+    HttpResponse,
 };
 use actix_web_flash_messages::{IncomingFlashMessages, Level};
 use hmac::{Hmac, Mac};
