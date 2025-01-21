@@ -1,7 +1,7 @@
 application:
   port: 8000
   host: 0.0.0.0
-  hmac_secret: "ya-hya-chouhada"
+  hmac_secret: "695d00d11-341a-4fe2-a7b0-5aa19b8a058543baae9-d0e4-419b-9ac4-d4c366588454"
 database:
   host: "127.0.0.1"
   port: 5432
