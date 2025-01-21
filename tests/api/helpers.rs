@@ -176,6 +176,10 @@ impl TestApp {
             .await
             .expect("Failed to execute request.")
     }
+
+    pub async fn get_change_password_html(&self) -> String {
+        self.get_change_password().await.text().await.unwrap()
+    }
 }
 
 async fn configure_database(config: &DatabaseSettings) -> PgPool {
