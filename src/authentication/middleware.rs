@@ -3,8 +3,8 @@ use crate::utils::{e500, see_other};
 use actix_web::body::MessageBody;
 use actix_web::dev::{ServiceRequest, ServiceResponse};
 use actix_web::error::InternalError;
+use actix_web::middleware::Next;
 use actix_web::{FromRequest, HttpMessage};
-use actix_web_lab::middleware::Next;
 use std::ops::Deref;
 use uuid::Uuid;
 
@@ -37,7 +37,7 @@ pub async fn reject_anonymous_users(
     match session.get_user_id().map_err(e500)? {
         Some(user_id) => {
             req.extensions_mut().insert(UserId(user_id));
-            next.run(req).await
+            next.call(req).await
         }
         None => {
             let response = see_other("/login");
