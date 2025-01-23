@@ -36,6 +36,15 @@ pub async fn get_saved_response(
     }
 }
 
+pub async fn save_response(
+    _pool: &PgPool,
+    _idempotency_key: &IdempotencyKey,
+    _user_id: Uuid,
+    _response: HttpResponse,
+) -> Result<(), anyhow::Error> {
+    todo!()
+}
+
 #[derive(Debug, sqlx::Type)]
 #[sqlx(type_name = "header_pair")]
 struct HeaderPairRecord {
