@@ -95,6 +95,27 @@ mod test {
         }
     }
 
+    fn subject() -> String {
+        Sentence(1..2).fake()
+    }
+
+    fn content() -> String {
+        Paragraph(1..10).fake()
+    }
+
+    fn email() -> SubscriberEmail {
+        SubscriberEmail::parse(SafeEmail().fake()).unwrap()
+    }
+
+    fn email_client(base_url: String) -> EmailClient {
+        EmailClient::new(
+            base_url,
+            email(),
+            Secret::new(Faker.fake()),
+            std::time::Duration::from_millis(200),
+        )
+    }
+
     #[tokio::test]
     async fn send_email_sends_the_expected_request() {
         let mock_server = MockServer::start().await;
@@ -168,26 +189,5 @@ mod test {
             .await;
 
         assert_err!(outcome);
-    }
-
-    fn subject() -> String {
-        Sentence(1..2).fake()
-    }
-
-    fn content() -> String {
-        Paragraph(1..10).fake()
-    }
-
-    fn email() -> SubscriberEmail {
-        SubscriberEmail::parse(SafeEmail().fake()).unwrap()
-    }
-
-    fn email_client(base_url: String) -> EmailClient {
-        EmailClient::new(
-            base_url,
-            email(),
-            Secret::new(Faker.fake()),
-            std::time::Duration::from_millis(200),
-        )
     }
 }

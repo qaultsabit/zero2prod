@@ -8,7 +8,7 @@ impl SubscriberEmail {
         if ValidateEmail::validate_email(&s) {
             Ok(Self(s))
         } else {
-            Err(format!("{} is not a valid email address", s))
+            Err(format!("{} is not a valid subscriber email.", s))
         }
     }
 }
@@ -31,6 +31,8 @@ mod test {
     use claims::assert_err;
     use fake::faker::internet::en::SafeEmail;
     use fake::Fake;
+    use rand::rngs::StdRng;
+    use rand::SeedableRng;
 
     #[test]
     fn empty_string_is_rejected() {
@@ -54,8 +56,9 @@ mod test {
     struct ValidEmailFixture(pub String);
 
     impl quickcheck::Arbitrary for ValidEmailFixture {
-        fn arbitrary<G: quickcheck::Gen>(g: &mut G) -> Self {
-            let email = SafeEmail().fake_with_rng(g);
+        fn arbitrary(g: &mut quickcheck::Gen) -> Self {
+            let mut rng = StdRng::seed_from_u64(u64::arbitrary(g));
+            let email = SafeEmail().fake_with_rng(&mut rng);
             Self(email)
         }
     }
