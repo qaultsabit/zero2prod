@@ -1,5 +1,4 @@
-
-# Zero To Production / Code
+# Zero To Production
 
 <div align="center"><a href="https://zero2prod.com" target="_blank"><img src="https://www.zero2prod.com/assets/img/zero2prod.png" width="75%" /></a></div>
 
