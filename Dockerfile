@@ -1,6 +1,6 @@
 FROM lukemathwalker/cargo-chef:latest-rust-1.83.0 as chef
 WORKDIR /app
-RUN apt update && apt install lld clang -y
+RUN apt-get update && apt-get install lld clang -y --no-install-recommends
 
 FROM chef as planner
 COPY . .
